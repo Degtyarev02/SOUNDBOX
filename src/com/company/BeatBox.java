@@ -1,9 +1,6 @@
 package com.company;
 
-import javax.sound.midi.MidiSystem;
-import javax.sound.midi.Sequence;
-import javax.sound.midi.Sequencer;
-import javax.sound.midi.Track;
+import javax.sound.midi.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -121,49 +118,71 @@ public class BeatBox {
                 }
             }
             makeTracks(trackList);
-            track.add(makeEvent(176, 1, 127, 0, 16));
+            track.add(MakeMidiEvent(176, 1, 127, 0, 16));
         }
 
-        track.add(makeEvent(192, 9, 1, 0, 15));
+        track.add(MakeMidiEvent(192, 9, 1, 0, 15));
         try {
             sequencer.setSequence(sequence);
             sequencer.setLoopCount(sequencer.LOOP_CONTINUOUSLY);
             sequencer.start();
             sequencer.setTempoInBPM(120);
-        } catch (Exception ex){ex.printStackTrace();}
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
-      
 
     private void makeTracks(int[] trackList) {
-
+        for (int i = 0; i < 16; i++) {
+            int key = trackList[i];
+            if (key != 0) {
+                track.add(MakeMidiEvent(144, 9, key, 100, i));
+                track.add(MakeMidiEvent(128, 9, key, 100, i + 1));
+            }
+        }
     }
 
     private class MyStartListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-
+            buildTrackAndStart();
         }
     }
 
     private class MyStopListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-
+            sequencer.stop();
         }
     }
 
     private class MyUpTempoListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-
+            float tempoFactor = sequencer.getTempoFactor();
+            sequencer.setTempoFactor((float) (tempoFactor * 1.03));
         }
     }
 
     private class MyDownTempoListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-
+            float tempoFactor = sequencer.getTempoFactor();
+            sequencer.setTempoFactor((float) (tempoFactor * .97));
         }
+    }
+
+    public static MidiEvent MakeMidiEvent(int command, int channel, int one, int two, int tick) {
+        MidiEvent midiEvent = null;
+        try {
+            ShortMessage message = new ShortMessage();
+            message.setMessage(command, channel, one, two);
+            midiEvent = new MidiEvent(message, tick);
+
+        } catch (Exception ex) {
+        }
+
+        return midiEvent;
     }
 }
