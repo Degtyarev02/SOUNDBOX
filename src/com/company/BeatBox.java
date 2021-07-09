@@ -20,11 +20,11 @@ public class BeatBox {
     JFrame mainFrame;
 
     String[] instrumentNames = {"Bass Drum", "Closed Hi-Hat",
-            "Open Hi-Hat","Acoustic Snare", "Crash Cymbal", "Hand Clap",
+            "Open Hi-Hat", "Acoustic Snare", "Crash Cymbal", "Hand Clap",
             "High Tom", "Hi Bongo", "Maracas", "Whistle", "Low Conga",
             "Cowbell", "VibraSlap", "Low-mid Tom", "High Agogo",
             "Open Hi Conga"};
-    int[] instruments = {35,42,46,38,49,39,50,60,70,72,64,56,58,47,67,63};
+    int[] instruments = {35, 42, 46, 38, 49, 39, 50, 60, 70, 72, 64, 56, 58, 47, 67, 63};
 
     public static void main(String[] args) {
         new BeatBox().buildGUI();
@@ -58,8 +58,7 @@ public class BeatBox {
         buttonBox.add(downTempo);
 
         Box nameBox = new Box(BoxLayout.Y_AXIS);
-        for(int i = 0; i < 16; i++)
-        {
+        for (int i = 0; i < 16; i++) {
             nameBox.add(new Label(instrumentNames[i]));
         }
 
@@ -98,7 +97,46 @@ public class BeatBox {
             sequence = new Sequence(Sequence.PPQ, 4);
             track = sequence.createTrack();
             sequencer.setTempoInBPM(120);
-        } catch (Exception ex) {ex.printStackTrace();}
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void buildTrackAndStart() {
+        int[] trackList = null;
+
+        sequence.deleteTrack(track);
+        track = sequence.createTrack();
+
+        for (int i = 0; i < 16; i++) {
+            trackList = new int[16];
+            int key = instruments[i];
+
+            for (int j = 0; j < 16; j++) {
+                JCheckBox jCheckBox = (JCheckBox) checkBoxArrayList.get(j + (16 * i));
+                if (jCheckBox.isSelected()) {
+                    trackList[j] = key;
+                } else {
+                    trackList[j] = 0;
+                }
+            }
+            makeTracks(trackList);
+            track.add(makeEvent(176, 1, 127, 0, 16));
+        }
+
+        track.add(makeEvent(192, 9, 1, 0, 15));
+        try {
+            sequencer.setSequence(sequence);
+            sequencer.setLoopCount(sequencer.LOOP_CONTINUOUSLY);
+            sequencer.start();
+            sequencer.setTempoInBPM(120);
+        } catch (Exception ex){ex.printStackTrace();}
+    }
+
+      
+
+    private void makeTracks(int[] trackList) {
+
     }
 
     private class MyStartListener implements ActionListener {
