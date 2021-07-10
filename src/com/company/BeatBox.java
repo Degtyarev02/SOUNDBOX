@@ -161,7 +161,7 @@ public class BeatBox {
         @Override
         public void actionPerformed(ActionEvent e) {
             float tempoFactor = sequencer.getTempoFactor();
-            sequencer.setTempoFactor((float) (tempoFactor * 1.03));
+            sequencer.setTempoFactor((float) (tempoFactor * 1.05));
         }
     }
 
@@ -169,7 +169,7 @@ public class BeatBox {
         @Override
         public void actionPerformed(ActionEvent e) {
             float tempoFactor = sequencer.getTempoFactor();
-            sequencer.setTempoFactor((float) (tempoFactor * .97));
+            sequencer.setTempoFactor((float) (tempoFactor * .95));
         }
     }
 
