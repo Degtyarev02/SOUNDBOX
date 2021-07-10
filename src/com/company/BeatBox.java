@@ -180,8 +180,7 @@ public class BeatBox {
             message.setMessage(command, channel, one, two);
             midiEvent = new MidiEvent(message, tick);
 
-        } catch (Exception ex) {
-        }
+        } catch (Exception ex) {ex.printStackTrace();}
 
         return midiEvent;
     }
