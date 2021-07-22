@@ -2,21 +2,31 @@ package com.company;
 
 import javax.sound.midi.*;
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.net.Socket;
 import java.security.spec.ECField;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Vector;
 
 public class BeatBox {
     JPanel mainPanel;
+    JList incomingList;
     ArrayList<JCheckBox> checkBoxArrayList;
     Sequencer sequencer;
     Sequence sequence;
+    Sequence mySequence = null;
     Track track;
     JFrame mainFrame;
+    String userName;
+    ObjectInputStream in;
+    ObjectOutputStream out;
+    JTextField userMessage;
+    Vector<String> listVector = new Vector<>();
 
     String[] instrumentNames = {"Bass Drum", "Closed Hi-Hat",
             "Open Hi-Hat", "Acoustic Snare", "Crash Cymbal", "Hand Clap",
@@ -25,8 +35,26 @@ public class BeatBox {
             "Open Hi Conga"};
     int[] instruments = {35, 42, 46, 38, 49, 39, 50, 60, 70, 72, 64, 56, 58, 47, 67, 63};
 
+
     public static void main(String[] args) {
-        new BeatBox().buildGUI();
+        new BeatBox().startUp("args[0]");
+    }
+
+    public void startUp(String name)
+    {
+        userName = name;
+        try{
+            Socket socket = new Socket("192.168.0.104", 4244);
+            out = new ObjectOutputStream(socket.getOutputStream());
+            in = new ObjectInputStream(socket.getInputStream());
+            Thread remote = new Thread(new RemoteReader);
+            remote.start();
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+        setUpMIDI();
+        buildGUI();
+
     }
 
     private void buildGUI() {
@@ -56,13 +84,28 @@ public class BeatBox {
         downTempo.addActionListener(new MyDownTempoListener());
         buttonBox.add(downTempo);
 
-        JButton serializeIt = new JButton("Serialize");
+        /*JButton serializeIt = new JButton("Serialize");
         serializeIt.addActionListener(new SerializeListener());
         buttonBox.add(serializeIt);
 
         JButton restoreIt = new JButton("Restore");
         restoreIt.addActionListener(new RestoreListener());
-        buttonBox.add(restoreIt);
+        buttonBox.add(restoreIt);*/
+
+        JButton sendIt = new JButton("Send");
+        sendIt.addActionListener(new MysSendListener());
+        buttonBox.add(sendIt);
+
+        userMessage = new JTextField();
+        buttonBox.add(userMessage);
+
+        incomingList = new JList();
+        incomingList.addListSelectionListener(new MyListSelectionListener());
+        incomingList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        JScrollPane theList = new JScrollPane(incomingList);
+        buttonBox.add(theList);
+        incomingList.setListData(listVector);
+
 
         Box nameBox = new Box(BoxLayout.Y_AXIS);
         for (int i = 0; i < 16; i++) {
@@ -87,8 +130,6 @@ public class BeatBox {
             mainPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
             mainPanel.add(checkBox);
         }
-
-        setUpMIDI();
 
         mainFrame.setBounds(50, 50, 300, 300);
         mainFrame.pack();
@@ -240,6 +281,20 @@ public class BeatBox {
                     checkBox.setSelected(false);
                 }
             }
+        }
+    }
+
+    private class MysSendListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+        }
+    }
+
+    private class MyListSelectionListener implements javax.swing.event.ListSelectionListener {
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+
         }
     }
 }
