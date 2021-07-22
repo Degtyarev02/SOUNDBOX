@@ -27,6 +27,7 @@ public class BeatBox {
     ObjectOutputStream out;
     JTextField userMessage;
     Vector<String> listVector = new Vector<>();
+    int nextNum;
 
     String[] instrumentNames = {"Bass Drum", "Closed Hi-Hat",
             "Open Hi-Hat", "Acoustic Snare", "Crash Cymbal", "Hand Clap",
@@ -40,10 +41,9 @@ public class BeatBox {
         new BeatBox().startUp("args[0]");
     }
 
-    public void startUp(String name)
-    {
+    public void startUp(String name) {
         userName = name;
-        try{
+        try {
             Socket socket = new Socket("192.168.0.104", 4244);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
@@ -287,7 +287,22 @@ public class BeatBox {
     private class MysSendListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-
+            boolean[] chekBoxState = new boolean[256];
+            for (int i = 0; i < 256; i++) {
+                JCheckBox check = (JCheckBox) checkBoxArrayList.get(i);
+                if (check.isSelected()) {
+                    chekBoxState[i] = true;
+                }
+            }
+            String messageToSend = null;
+            try {
+                out.writeObject(userName + nextNum++ + ": " + userMessage.getText());
+                out.writeObject(chekBoxState);
+            } catch (Exception exception) {
+                exception.printStackTrace();
+                System.out.println("Couldn't send to server");
+            }
+            userMessage.setText("");
         }
     }
 
