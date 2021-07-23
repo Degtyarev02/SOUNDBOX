@@ -311,11 +311,9 @@ public class BeatBox {
     private class MyListSelectionListener implements javax.swing.event.ListSelectionListener {
         @Override
         public void valueChanged(ListSelectionEvent le) {
-            if(!le.getValueIsAdjusting())
-            {
+            if (!le.getValueIsAdjusting()) {
                 String selected = (String) incomingList.getSelectedValue();
-                if (selected != null)
-                {
+                if (selected != null) {
                     boolean[] selectedState = (boolean[]) outherSeqsMap.get(selected);
                     changeSequence(selectedState);
                     sequencer.stop();
@@ -326,16 +324,44 @@ public class BeatBox {
     }
 
     private class RemoteReader implements Runnable {
+        boolean[] checkbox = null;
+        Object obj = null;
+
         @Override
         public void run() {
-
+            try {
+                while ((obj = in.readObject()) != null) {
+                    System.out.println("Got an obj");
+                    System.out.println(obj.getClass());
+                    String nameToShow = (String) obj;
+                    checkbox = (boolean[]) in.readObject();
+                    outherSeqsMap.put(nameToShow, checkbox);
+                    listVector.add(nameToShow);
+                    incomingList.setListData(listVector);
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
-
-
     }
 
-    public void changeSequence(boolean[] checkboxState)
-    {
+    public class MyPlayMineListener implements ActionListener {
 
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (mySequence != null) {
+                sequence = mySequence;
+            }
+        }
+    }
+
+    public void changeSequence(boolean[] checkboxState) {
+        for (int i = 0; i < 256; i++) {
+            JCheckBox checkBox = (JCheckBox) checkBoxArrayList.get(i);
+            if (checkboxState[i]) {
+                checkBox.setSelected(true);
+            } else checkBox.setSelected(false);
+
+        }
     }
 }
