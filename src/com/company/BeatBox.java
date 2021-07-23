@@ -11,6 +11,7 @@ import java.net.Socket;
 import java.security.spec.ECField;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.Vector;
 
 public class BeatBox {
@@ -28,6 +29,7 @@ public class BeatBox {
     JTextField userMessage;
     Vector<String> listVector = new Vector<>();
     int nextNum;
+    HashMap<String, boolean[]> outherSeqsMap = new HashMap<>();
 
     String[] instrumentNames = {"Bass Drum", "Closed Hi-Hat",
             "Open Hi-Hat", "Acoustic Snare", "Crash Cymbal", "Hand Clap",
@@ -47,7 +49,7 @@ public class BeatBox {
             Socket socket = new Socket("192.168.0.104", 4244);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
-            Thread remote = new Thread(new RemoteReader);
+            Thread remote = new Thread(new RemoteReader());
             remote.start();
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -308,8 +310,32 @@ public class BeatBox {
 
     private class MyListSelectionListener implements javax.swing.event.ListSelectionListener {
         @Override
-        public void valueChanged(ListSelectionEvent e) {
+        public void valueChanged(ListSelectionEvent le) {
+            if(!le.getValueIsAdjusting())
+            {
+                String selected = (String) incomingList.getSelectedValue();
+                if (selected != null)
+                {
+                    boolean[] selectedState = (boolean[]) outherSeqsMap.get(selected);
+                    changeSequence(selectedState);
+                    sequencer.stop();
+                    buildTrackAndStart();
+                }
+            }
+        }
+    }
+
+    private class RemoteReader implements Runnable {
+        @Override
+        public void run() {
 
         }
+
+
+    }
+
+    public void changeSequence(boolean[] checkboxState)
+    {
+
     }
 }
