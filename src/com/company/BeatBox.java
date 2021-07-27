@@ -86,14 +86,6 @@ public class BeatBox {
         downTempo.addActionListener(new MyDownTempoListener());
         buttonBox.add(downTempo);
 
-        /*JButton serializeIt = new JButton("Serialize");
-        serializeIt.addActionListener(new SerializeListener());
-        buttonBox.add(serializeIt);
-
-        JButton restoreIt = new JButton("Restore");
-        restoreIt.addActionListener(new RestoreListener());
-        buttonBox.add(restoreIt);*/
-
         JButton sendIt = new JButton("Send");
         sendIt.addActionListener(new MysSendListener());
         buttonBox.add(sendIt);
